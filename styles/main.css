@@ -2033,8 +2033,9 @@ h1[theme="DASHBOARD"] {
 #page-title-container{
   display:none !important;
 }
-ytcp-entity-page-header{
-    display:none;
+
+ytcp-entity-page-header:not(:has(.ytcp-video-details-section)) {
+		display:none;
 }
 
 
