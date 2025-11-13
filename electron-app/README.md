@@ -14,7 +14,7 @@ npm install
 npm start
 ```
 
-The server will run on `http://localhost:3000` and appear as a system tray icon.
+The server will run on `http://localhost:6767` and appear as a system tray icon.
 
 ## Features
 
@@ -30,10 +30,10 @@ The server will run on `http://localhost:3000` and appear as a system tray icon.
 1. Start the Electron app
 2. Open the Chrome extension on YouTube Studio analytics page
 3. Enable "Electron Backend" toggle in the analytics dashboard
-4. Access the mobile dashboard at `http://localhost:3000` on your mobile device (same network)
+4. Access the mobile dashboard at `http://localhost:6767` on your mobile device (same network)
 5. Install as PWA on mobile device for easy access
 
 ## Configuration
 
-The Chrome extension connects to `http://localhost:3000` by default. This can be changed in the extension settings.
+The Chrome extension connects to `http://localhost:6767` by default. This can be changed in the extension settings.
 
