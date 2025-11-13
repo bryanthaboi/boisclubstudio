@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "description": "Local analytics server for BCS Chrome Extension",
   "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bryanthaboi/boisclubstudio.git"
+  },
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
     "build": "electron-builder"
   },
   "keywords": ["electron", "analytics", "server"],
-  "author": "",
-  "license": "ISC",
+  "author": "bryanthaboi, bois club games LLC",
+  "license": "ISC License - See [LICENSE](/LICENSE.md) file for details.",
   "dependencies": {
     "express": "^4.18.2"
   },
