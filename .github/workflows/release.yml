@@ -1,0 +1,164 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-extension:
+    name: Build Chrome Extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create extension zip
+        run: |
+          cd ${{ github.workspace }}
+          zip -r studio-quick-panel-extension.zip \
+            manifest.json \
+            content.js \
+            inject.js \
+            data/ \
+            styles/ \
+            icons/ \
+            -x "*.git*" "*.DS_Store"
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: studio-quick-panel-extension.zip
+
+  build-electron:
+    name: Build Electron App
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: electron-app/package-lock.json
+
+      - name: Install dependencies
+        working-directory: electron-app
+        run: npm ci
+
+      - name: Build Electron app (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: electron-app
+        run: |
+          npm run build -- --linux --x64 --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Electron app (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: electron-app
+        run: |
+          npm run build -- --win --x64 --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Electron app (macOS)
+        if: matrix.os == 'macos-latest'
+        working-directory: electron-app
+        run: |
+          npm run build -- --mac --x64 --publish never
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Note: Building unsigned Mac apps requires no special setup
+          # Signed builds would require Apple Developer certificates, but unsigned works fine
+
+      - name: Upload Electron artifacts (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-linux
+          path: electron-app/dist/*.{AppImage,tar.gz,deb}
+          if-no-files-found: ignore
+
+      - name: Upload Electron artifacts (Windows)
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-windows
+          path: electron-app/dist/*.exe
+          if-no-files-found: ignore
+
+      - name: Upload Electron artifacts (macOS)
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-macos
+          path: electron-app/dist/*.{dmg,zip}
+          if-no-files-found: ignore
+
+  create-release:
+    name: Create Release
+    needs: [build-extension, build-electron]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download extension artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension
+          path: ./artifacts/extension
+
+      - name: Download Electron artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./artifacts/electron
+          pattern: electron-*
+
+      - name: Extract tag name
+        id: tag
+        run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag.outputs.TAG }}
+          name: Release ${{ steps.tag.outputs.TAG }}
+          body: |
+            ## 🎉 Release ${{ steps.tag.outputs.TAG }}
+
+            ### 📦 Downloads
+
+            #### Chrome Extension
+            - **studio-quick-panel-extension.zip** - Unzip and load in Chrome as an unpacked extension
+
+            #### Electron Backend App ⚠️ **OPTIONAL**
+            - **Windows**: `bcs-analytics-server-win-x64.exe`
+            - **macOS**: `bcs-analytics-server-darwin-x64.dmg` or `.zip` *(Unsigned build)*
+            - **Linux**: `bcs-analytics-server-linux-x64.AppImage` or `.tar.gz`
+
+            **Note**: The Electron backend is completely optional! The Chrome extension works perfectly on its own. This is only for people who want mobile/remote access to their analytics dashboard.
+
+            **Mac Build Note**: We build unsigned Mac apps (no Apple Developer certificate needed). macOS will show a security warning the first time - just right-click → "Open" → "Open" in the dialog. This is normal and safe for open-source apps.
+
+            ### 📝 Installation
+            See the [README](https://github.com/${{ github.repository }}/blob/main/README.md) for detailed installation instructions.
+
+            ### 🔗 Full Changelog
+            See [commits](https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ steps.tag.outputs.TAG }}) for all changes.
+          files: |
+            artifacts/extension/*.zip
+            artifacts/electron/electron-linux/*
+            artifacts/electron/electron-windows/*
+            artifacts/electron/electron-macos/*
+          draft: false
+          prerelease: false

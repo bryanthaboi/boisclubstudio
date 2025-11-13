@@ -1,0 +1,311 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-primary: #000000;
+    --bg-secondary: #0a0a0a;
+    --bg-card: #111111;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --accent: #a957ff;
+    --accent-hover: #8d47d9;
+    --success: #4caf50;
+    --warning: #ff9800;
+    --error: #f44336;
+    --border: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    font-size: 13px;
+}
+
+.dashboard-container {
+    min-height: 100vh;
+    padding: 0;
+    max-width: 100%;
+}
+
+.last-update {
+    position: fixed;
+    top: 4px;
+    left: 8px;
+    font-size: 0.5rem;
+    color: var(--text-secondary);
+    opacity: 0.5;
+    z-index: 1000;
+    font-family: monospace;
+}
+
+.dashboard-content {
+    padding: 0.75rem;
+    max-width: 100%;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+/* Subscriber Banner - Full Width One Line */
+.subscriber-banner {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: left;
+    width: 100%;
+}
+
+/* Video Table - Compact */
+.videos-container {
+    margin-top: 0.75rem;
+}
+
+.videos-header {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.video-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.video-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.625rem;
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+}
+
+.video-header {
+    display: flex;
+    gap: 0.625rem;
+    align-items: flex-start;
+    flex: 1;
+    min-width: 0;
+}
+
+.video-thumbnail {
+    width: 45px;
+    height: 25px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.video-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.video-title {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.375rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.video-metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    color: var(--text-secondary);
+}
+
+.metric-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.125rem 0.375rem;
+    background: rgba(169, 87, 255, 0.1);
+    border: 1px solid rgba(169, 87, 255, 0.2);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.metric-badge.metric-updated {
+    animation: metricPulse 0.6s ease;
+    background: rgba(169, 87, 255, 0.3);
+    border-color: var(--accent);
+    transform: scale(1.05);
+}
+
+@keyframes metricPulse {
+    0%, 100% { 
+        transform: scale(1);
+        background: rgba(169, 87, 255, 0.1);
+    }
+    50% { 
+        transform: scale(1.1);
+        background: rgba(169, 87, 255, 0.4);
+    }
+}
+
+/* Sparklines - Compact */
+.sparkline-container {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.sparkline-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    gap: 0.5rem;
+}
+
+.sparkline-label {
+    color: var(--text-secondary);
+    font-size: 0.6875rem;
+    min-width: 60px;
+    flex-shrink: 0;
+}
+
+.sparkline-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.sparkline-svg {
+    width: 80px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.sparkline-svg path {
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.sparkline-svg .sparkline-area {
+    fill: url(#sparkline-gradient);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .banners-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 300px;
+    pointer-events: none;
+}
+
+.toast {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateX(400px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: auto;
+    max-width: 100%;
+}
+
+.toast.toast-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-thumb {
+    width: 60px;
+    height: 34px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.toast-text {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.toast-title {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.toast-subscriber {
+    border-color: var(--accent);
+    background: rgba(169, 87, 255, 0.05);
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+    .last-update {
+        top: env(safe-area-inset-top, 4px);
+    }
+}
+

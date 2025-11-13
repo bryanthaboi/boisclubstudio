@@ -1,0 +1,84 @@
+{
+  "earningsQuery": {
+    "key": "2__TOP_ENTITIES_TABLE_QUERY_KEY",
+    "value": {
+      "query": {
+        "dimensions": [
+          {
+            "type": "VIDEO"
+          }
+        ],
+        "metrics": [
+          {
+            "type": "SUBSCRIBERS_NET_CHANGE",
+            "includeTotal": true
+          },
+          {
+            "type": "TOTAL_ESTIMATED_EARNINGS",
+            "includeTotal": true
+          },
+          {
+            "type": "EXTERNAL_WATCH_TIME",
+            "includeTotal": true
+          },
+          {
+            "type": "VIDEO_THUMBNAIL_IMPRESSIONS_VTR",
+            "includeTotal": true
+          }
+        ],
+        "restricts": [
+          
+        ],
+        "orders": [
+          {
+            "metric": {
+              "type": "TOTAL_ESTIMATED_EARNINGS"
+            },
+            "direction": "ANALYTICS_ORDER_DIRECTION_DESC"
+          }
+        ],
+        "timeRange": {
+          "dateIdRange": {
+            "inclusiveStart": 20251009,
+            "exclusiveEnd": 20251106
+          }
+        },
+        "limit": {
+          "pageSize": 50,
+          "pageOffset": 0
+        },
+        "currency": "USD",
+        "returnDataInNewFormat": true,
+        "limitedToBatchedData": false
+      }
+    }
+  },
+  "cumSubsQueryTemplate": {
+    "key": "0__CUMULATIVE_SUBSCRIBERS_KEY",
+    "value": {
+      "getCards": {
+        "screenConfig": {
+          "entity": {},
+          "timePeriod": {
+            "timePeriodType": "ANALYTICS_TIME_PERIOD_TYPE_FOUR_WEEKS"
+          },
+          "currency": "USD",
+          "timeZoneOffsetSecs": -18000
+        },
+        "cardConfigs": [
+          {
+            "autoUpdateInterval": "ANALYTICS_AUTO_UPDATE_INTERVAL_NEVER",
+            "cumulativeSubscribersCardConfig": {
+              "returnTableData": true,
+              "returnLifetimeTotal": true
+            }
+          }
+        ],
+        "enabledExperiments": "__ENABLED_EXPERIMENTS_PLACEHOLDER__",
+        "experimentFlags": "__EXPERIMENT_FLAGS_PLACEHOLDER__",
+        "fetchingType": "FETCHING_TYPE_FOREGROUND"
+      }
+    }
+  }
+}
+

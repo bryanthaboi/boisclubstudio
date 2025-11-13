@@ -1,0 +1,33 @@
+{
+	"manifest_version": 3,
+	"name": "Better YouTube Studio aka Boi's Club Studio",
+	"version": "1.0.0",
+	"description": "Enhanced YouTube Studio with beautiful analytics dashboard and quick access menu.",
+	"icons": {
+		"16": "icons/icon-16.png",
+		"48": "icons/icon-48.png",
+		"128": "icons/icon-128.png"
+	},
+	"permissions": [
+		"storage",
+		"cookies",
+		"scripting",
+		"activeTab",
+		"tabs",
+		"debugger"
+	],
+	"host_permissions": ["https://studio.youtube.com/*"],
+	"content_scripts": [
+		{
+			"matches": ["https://studio.youtube.com/*"],
+			"js": ["content.js"],
+			"run_at": "document_idle"
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"resources": ["icons/*.svg", "inject.js", "data/queries.json", "styles/main.css"],
+			"matches": ["https://studio.youtube.com/*"]
+		}
+	]
+}
