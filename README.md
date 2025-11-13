@@ -1,5 +1,6 @@
 # 🎬 Better YouTube Studio aka Boi's Club Studio
 ![Bois Club Studio Logo](/logo.png)
+> **Transform your YouTube Studio experience** with a beautiful, modern analytics dashboard that reveals metrics YouTube collects but never shows you.
 
 
 [![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-brightgreen.svg)](#-installation)
