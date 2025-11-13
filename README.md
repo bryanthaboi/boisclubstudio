@@ -510,7 +510,7 @@ app.listen(3000, () => {
 We'd love to hear your ideas! Here are some ways to contribute:
 
 ### 🎥 **YouTube Video**
-Have a suggestion or found a bug? Mention it in the comments of my [YouTube video](https://youtube.com/@bryanthaboi2) about this extension!
+Have a suggestion or found a bug? Mention it in the comments of my [YouTube video](https://youtu.be/KrQqvDr36qQ) about this extension!
 
 ### 🐛 **GitHub Issues**
 - **Found a bug?** [Open an issue](https://github.com/bryanthaboi/boisclubstudio/issues) with details
