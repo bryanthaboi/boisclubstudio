@@ -184,8 +184,11 @@ jobs:
             See [commits](https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ steps.tag.outputs.TAG }}) for all changes.
           files: |
             artifacts/extension/*.zip
-            artifacts/electron/electron-linux/**/*
-            artifacts/electron/electron-windows/**/*
-            artifacts/electron/electron-macos/**/*
+            artifacts/electron/*.AppImage
+            artifacts/electron/*.tar.gz
+            artifacts/electron/*.deb
+            artifacts/electron/*.exe
+            artifacts/electron/*.dmg
+            artifacts/electron/*.zip
           draft: false
           prerelease: false
