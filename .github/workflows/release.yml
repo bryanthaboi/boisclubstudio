@@ -6,6 +6,10 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-extension:
     name: Build Chrome Extension
@@ -90,8 +94,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: electron-linux
-          path: electron-app/dist/*.{AppImage,tar.gz,deb}
-          if-no-files-found: ignore
+          path: |
+            electron-app/dist/*.AppImage
+            electron-app/dist/*.tar.gz
+            electron-app/dist/*.deb
+          if-no-files-found: warn
 
       - name: Upload Electron artifacts (Windows)
         if: matrix.os == 'windows-latest'
@@ -99,21 +106,26 @@ jobs:
         with:
           name: electron-windows
           path: electron-app/dist/*.exe
-          if-no-files-found: ignore
+          if-no-files-found: warn
 
       - name: Upload Electron artifacts (macOS)
         if: matrix.os == 'macos-latest'
         uses: actions/upload-artifact@v4
         with:
           name: electron-macos
-          path: electron-app/dist/*.{dmg,zip}
-          if-no-files-found: ignore
+          path: |
+            electron-app/dist/*.dmg
+            electron-app/dist/*.zip
+          if-no-files-found: warn
+          exclude: "*.blockmap"
 
   create-release:
     name: Create Release
     needs: [build-extension, build-electron]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -129,10 +141,19 @@ jobs:
         with:
           path: ./artifacts/electron
           pattern: electron-*
+          merge-multiple: true
 
       - name: Extract tag name
         id: tag
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: List downloaded artifacts
+        run: |
+          echo "Extension artifacts:"
+          find artifacts/extension -type f || echo "No extension artifacts found"
+          echo ""
+          echo "Electron artifacts:"
+          find artifacts/electron -type f || echo "No electron artifacts found"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -163,8 +184,8 @@ jobs:
             See [commits](https://github.com/${{ github.repository }}/compare/${{ github.event.before }}...${{ steps.tag.outputs.TAG }}) for all changes.
           files: |
             artifacts/extension/*.zip
-            artifacts/electron/electron-linux/*
-            artifacts/electron/electron-windows/*
-            artifacts/electron/electron-macos/*
+            artifacts/electron/electron-linux/**/*
+            artifacts/electron/electron-windows/**/*
+            artifacts/electron/electron-macos/**/*
           draft: false
           prerelease: false
