@@ -1292,9 +1292,9 @@
 			const analyticsContainer = document.querySelector("yta-explore-latest-activity, yta-explore-page");
 			if (analyticsContainer && !bcsAnalyticsObserver) {
 				bcsAnalyticsObserver = new MutationObserver(() => {
-					// Check for error section and auto-refresh if found
+					// Check for error section and auto-refresh if found (only if visible, not hidden)
 					const errorSection = document.querySelector("ytcp-error-section.yta-explore-page");
-					if (errorSection && bcsCustomTableContainer) {
+					if (errorSection && bcsCustomTableContainer && !errorSection.hasAttribute("hidden")) {
 						console.log("[BCS] Error section detected, refreshing page...");
 						setTimeout(() => {
 							window.location.reload();
@@ -2825,110 +2825,182 @@
 				}
 
 				// Update metrics with individual badges for glow effect
+				// Only recreate badges if they don't exist or if metrics changed
 				if (metrics) {
-					const viewBadge = document.createElement("span");
-					viewBadge.className = "bcs-metric-badge";
-					viewBadge.textContent = `👁 ${formatNumber(videoData.viewCount || 0)}`;
-					viewBadge.title = "Total Views";
+					const existingBadges = metrics.querySelectorAll(".bcs-metric-badge");
+					const needsRecreate = existingBadges.length === 0 || hasMetricChange;
 
-					const likeBadge = document.createElement("span");
-					likeBadge.className = "bcs-metric-badge bcs-badge-likes";
-					likeBadge.textContent = `✅ ${formatNumber(videoData.likeCount || 0)}`;
-					likeBadge.title = "Likes";
-					if (likesChanged) {
-						likeBadge.classList.add("bcs-badge-glow");
-					}
-					if (isHotStreak(videoData.videoId, "likes")) {
-						likeBadge.classList.add("bcs-hot-streak");
+					if (needsRecreate) {
+						// Recreate all badges (only when needed)
+						const viewBadge = document.createElement("span");
+						viewBadge.className = "bcs-metric-badge";
+						viewBadge.textContent = `👁 ${formatNumber(videoData.viewCount || 0)}`;
+						viewBadge.title = "Total Views";
+
+						const likeBadge = document.createElement("span");
+						likeBadge.className = "bcs-metric-badge bcs-badge-likes";
+						likeBadge.textContent = `✅ ${formatNumber(videoData.likeCount || 0)}`;
+						likeBadge.title = "Likes";
+						if (likesChanged) {
+							likeBadge.classList.add("bcs-badge-glow");
+						}
+						if (isHotStreak(videoData.videoId, "likes")) {
+							likeBadge.classList.add("bcs-hot-streak");
+						} else {
+							likeBadge.classList.remove("bcs-hot-streak");
+						}
+						if (!bcsSettings.badges.likes) {
+							likeBadge.style.display = "none";
+						}
+
+						const commentBadge = document.createElement("span");
+						commentBadge.className = "bcs-metric-badge bcs-badge-comments";
+						commentBadge.textContent = `💬 ${formatNumber(videoData.commentCount || 0)}`;
+						commentBadge.title = "Comments";
+						if (commentsChanged) {
+							commentBadge.classList.add("bcs-badge-glow");
+						}
+						if (isHotStreak(videoData.videoId, "comments")) {
+							commentBadge.classList.add("bcs-hot-streak");
+						} else {
+							commentBadge.classList.remove("bcs-hot-streak");
+						}
+						if (!bcsSettings.badges.comments) {
+							commentBadge.style.display = "none";
+						}
+
+						const dislikeBadge = document.createElement("span");
+						dislikeBadge.className = "bcs-metric-badge bcs-badge-dislikes";
+						dislikeBadge.textContent = `👎 ${formatNumber(videoData.dislikeCount || 0)}`;
+						dislikeBadge.title = "Dislikes";
+						if (dislikesChanged) {
+							dislikeBadge.classList.add("bcs-badge-glow");
+						}
+						if (isHotStreak(videoData.videoId, "dislikes")) {
+							dislikeBadge.classList.add("bcs-hot-streak");
+						} else {
+							dislikeBadge.classList.remove("bcs-hot-streak");
+						}
+						if (!bcsSettings.badges.dislikes) {
+							dislikeBadge.style.display = "none";
+						}
+
+						metrics.innerHTML = "";
+						metrics.appendChild(viewBadge);
+						metrics.appendChild(likeBadge);
+						metrics.appendChild(commentBadge);
+						metrics.appendChild(dislikeBadge);
+
+						// Add earnings badge if earnings exist
+						if (videoData.earnings !== null && videoData.earnings !== undefined) {
+							const earningsBadge = document.createElement("span");
+							earningsBadge.className = "bcs-metric-badge";
+							earningsBadge.textContent = `💰 ${formatCurrency(videoData.earnings)}`;
+							earningsBadge.title = "Estimated Earnings";
+							metrics.appendChild(earningsBadge);
+						}
+
+						// Add subscriber net change badge if exists
+						if (videoData.subscriberNetChange !== null && videoData.subscriberNetChange !== undefined) {
+							const subChangeBadge = document.createElement("span");
+							subChangeBadge.className = "bcs-metric-badge";
+							const sign = videoData.subscriberNetChange >= 0 ? "+" : "";
+							subChangeBadge.textContent = `👥 ${sign}${formatNumber(videoData.subscriberNetChange)}`;
+							subChangeBadge.title = "Subscriber Net Change";
+							metrics.appendChild(subChangeBadge);
+						}
+
+						// Add watch time badge if exists
+						if (videoData.watchTime !== null && videoData.watchTime !== undefined) {
+							const watchTimeBadge = document.createElement("span");
+							watchTimeBadge.className = "bcs-metric-badge";
+							watchTimeBadge.textContent = `⏱ ${formatWatchTime(videoData.watchTime)}`;
+							watchTimeBadge.title = "External Watch Time (Hours)";
+							metrics.appendChild(watchTimeBadge);
+						}
+
+						// Add CTR badge if exists
+						if (videoData.ctr !== null && videoData.ctr !== undefined) {
+							const ctrBadge = document.createElement("span");
+							ctrBadge.className = "bcs-metric-badge";
+							ctrBadge.textContent = `📊 ${formatCTR(videoData.ctr)}`;
+							ctrBadge.title = "Click-Through Rate (CTR)";
+							metrics.appendChild(ctrBadge);
+						}
+
+						// Remove glow class after animation
+						if (likesChanged || commentsChanged || dislikesChanged) {
+							setTimeout(() => {
+								if (likeBadge.parentElement) likeBadge.classList.remove("bcs-badge-glow");
+								if (commentBadge.parentElement) commentBadge.classList.remove("bcs-badge-glow");
+								if (dislikeBadge.parentElement) dislikeBadge.classList.remove("bcs-badge-glow");
+							}, 1200);
+						}
 					} else {
-						likeBadge.classList.remove("bcs-hot-streak");
-					}
-					if (!bcsSettings.badges.likes) {
-						likeBadge.style.display = "none";
-					}
+						// Just update existing badges' content and classes without recreating
+						// Find existing badges and update them individually
+						const allBadges = metrics.querySelectorAll(".bcs-metric-badge");
+						allBadges.forEach(badge => {
+							// Update view badge (first badge without a specific class)
+							if (!badge.classList.contains("bcs-badge-likes") &&
+								!badge.classList.contains("bcs-badge-comments") &&
+								!badge.classList.contains("bcs-badge-dislikes") &&
+								badge.textContent.startsWith("👁")) {
+								const newText = `👁 ${formatNumber(videoData.viewCount || 0)}`;
+								if (badge.textContent !== newText) {
+									badge.textContent = newText;
+								}
+							}
+						});
 
-					const commentBadge = document.createElement("span");
-					commentBadge.className = "bcs-metric-badge bcs-badge-comments";
-					commentBadge.textContent = `💬 ${formatNumber(videoData.commentCount || 0)}`;
-					commentBadge.title = "Comments";
-					if (commentsChanged) {
-						commentBadge.classList.add("bcs-badge-glow");
-					}
-					if (isHotStreak(videoData.videoId, "comments")) {
-						commentBadge.classList.add("bcs-hot-streak");
-					} else {
-						commentBadge.classList.remove("bcs-hot-streak");
-					}
-					if (!bcsSettings.badges.comments) {
-						commentBadge.style.display = "none";
-					}
+						const likeBadge = metrics.querySelector(".bcs-badge-likes");
+						const commentBadge = metrics.querySelector(".bcs-badge-comments");
+						const dislikeBadge = metrics.querySelector(".bcs-badge-dislikes");
 
-					const dislikeBadge = document.createElement("span");
-					dislikeBadge.className = "bcs-metric-badge bcs-badge-dislikes";
-					dislikeBadge.textContent = `👎 ${formatNumber(videoData.dislikeCount || 0)}`;
-					dislikeBadge.title = "Dislikes";
-					if (dislikesChanged) {
-						dislikeBadge.classList.add("bcs-badge-glow");
-					}
-					if (isHotStreak(videoData.videoId, "dislikes")) {
-						dislikeBadge.classList.add("bcs-hot-streak");
-					} else {
-						dislikeBadge.classList.remove("bcs-hot-streak");
-					}
-					if (!bcsSettings.badges.dislikes) {
-						dislikeBadge.style.display = "none";
-					}
+						if (likeBadge) {
+							const newText = `✅ ${formatNumber(videoData.likeCount || 0)}`;
+							if (likeBadge.textContent !== newText) {
+								likeBadge.textContent = newText;
+							}
+							// Update hot streak class
+							if (isHotStreak(videoData.videoId, "likes")) {
+								likeBadge.classList.add("bcs-hot-streak");
+							} else {
+								likeBadge.classList.remove("bcs-hot-streak");
+							}
+							// Update visibility based on settings
+							likeBadge.style.display = bcsSettings.badges.likes ? "" : "none";
+						}
 
-					metrics.innerHTML = "";
-					metrics.appendChild(viewBadge);
-					metrics.appendChild(likeBadge);
-					metrics.appendChild(commentBadge);
-					metrics.appendChild(dislikeBadge);
+						if (commentBadge) {
+							const newText = `💬 ${formatNumber(videoData.commentCount || 0)}`;
+							if (commentBadge.textContent !== newText) {
+								commentBadge.textContent = newText;
+							}
+							// Update hot streak class
+							if (isHotStreak(videoData.videoId, "comments")) {
+								commentBadge.classList.add("bcs-hot-streak");
+							} else {
+								commentBadge.classList.remove("bcs-hot-streak");
+							}
+							// Update visibility based on settings
+							commentBadge.style.display = bcsSettings.badges.comments ? "" : "none";
+						}
 
-					// Add earnings badge if earnings exist
-					if (videoData.earnings !== null && videoData.earnings !== undefined) {
-						const earningsBadge = document.createElement("span");
-						earningsBadge.className = "bcs-metric-badge";
-						earningsBadge.textContent = `💰 ${formatCurrency(videoData.earnings)}`;
-						earningsBadge.title = "Estimated Earnings";
-						metrics.appendChild(earningsBadge);
-					}
-
-					// Add subscriber net change badge if exists
-					if (videoData.subscriberNetChange !== null && videoData.subscriberNetChange !== undefined) {
-						const subChangeBadge = document.createElement("span");
-						subChangeBadge.className = "bcs-metric-badge";
-						const sign = videoData.subscriberNetChange >= 0 ? "+" : "";
-						subChangeBadge.textContent = `👥 ${sign}${formatNumber(videoData.subscriberNetChange)}`;
-						subChangeBadge.title = "Subscriber Net Change";
-						metrics.appendChild(subChangeBadge);
-					}
-
-					// Add watch time badge if exists
-					if (videoData.watchTime !== null && videoData.watchTime !== undefined) {
-						const watchTimeBadge = document.createElement("span");
-						watchTimeBadge.className = "bcs-metric-badge";
-						watchTimeBadge.textContent = `⏱ ${formatWatchTime(videoData.watchTime)}`;
-						watchTimeBadge.title = "External Watch Time (Hours)";
-						metrics.appendChild(watchTimeBadge);
-					}
-
-					// Add CTR badge if exists
-					if (videoData.ctr !== null && videoData.ctr !== undefined) {
-						const ctrBadge = document.createElement("span");
-						ctrBadge.className = "bcs-metric-badge";
-						ctrBadge.textContent = `📊 ${formatCTR(videoData.ctr)}`;
-						ctrBadge.title = "Click-Through Rate (CTR)";
-						metrics.appendChild(ctrBadge);
-					}
-
-					// Remove glow class after animation
-					if (likesChanged || commentsChanged || dislikesChanged) {
-						setTimeout(() => {
-							if (likeBadge.parentElement) likeBadge.classList.remove("bcs-badge-glow");
-							if (commentBadge.parentElement) commentBadge.classList.remove("bcs-badge-glow");
-							if (dislikeBadge.parentElement) dislikeBadge.classList.remove("bcs-badge-glow");
-						}, 1200);
+						if (dislikeBadge) {
+							const newText = `👎 ${formatNumber(videoData.dislikeCount || 0)}`;
+							if (dislikeBadge.textContent !== newText) {
+								dislikeBadge.textContent = newText;
+							}
+							// Update hot streak class
+							if (isHotStreak(videoData.videoId, "dislikes")) {
+								dislikeBadge.classList.add("bcs-hot-streak");
+							} else {
+								dislikeBadge.classList.remove("bcs-hot-streak");
+							}
+							// Update visibility based on settings
+							dislikeBadge.style.display = bcsSettings.badges.dislikes ? "" : "none";
+						}
 					}
 				}
 			}
