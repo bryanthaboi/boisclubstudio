@@ -103,9 +103,7 @@
             ytcd-card-column:last-of-type {
                 width:600px !important;
             }
-			ytcp-button#see-explore-subscribers-button{
-				display: none;
-			}
+	
 				.card.ytcd-card-column {
 
    			  overflow: visible !important;
@@ -208,17 +206,7 @@
 			}
             ytcd-card-column .vidiq-scope { display: none !important; }
             ytcd-card-column:nth-of-type(2) > div { display: none !important; }
-            #podcast-list-tab{ display: none !important; }
-            #artist-releases-tab{ display: none !important; }
-            #video-list-collabs-tab{ display: none !important; }
-			/* Hide selected dashboard cards by test-id */
-            ytcd-card[test-id="channel-dashboard-ideas-card"],
-            ytcd-card[test-id="channel-dashboard-creator-insider-card"],
-			ytcd-card[test-id="channel-dashboard-product-updates-card"],
-			ytcd-card[test-id="channel-dashboard-creator-recognition-card"],
-			ytcd-card[test-id="channel-dashboard-shopping-card"],
-			ytcd-card[test-id="channel-dashboard-news-card"],
-			ytcd-card[test-id="channel-dashboard-recent-videos-card"] { display: none !important; }
+         
 
 			/* Floating badges for analytics page */
 			.bcs-floating-badge {
@@ -1353,10 +1341,8 @@ background:unset !important;}
 				box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4),
 					inset 0 1px 0 rgba(255, 255, 255, 0.2);
 			}
-yta-line-chart-base.yta-realtime-chart{
-display: none !important;}
-yta-latest-activity-card[mini] #main-chart.yta-latest-activity-card{
-display: none !important;}
+
+
 			.ytcpButtonShapeImpl--mono.ytcpButtonShapeImpl--tonal {
 				position: relative;
 				color: #f9f9f9;
