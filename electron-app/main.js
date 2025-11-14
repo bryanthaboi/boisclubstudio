@@ -16,7 +16,7 @@ function createTray() {
         {
             label: 'Open Dashboard',
             click: () => {
-                require('electron').shell.openExternal(`http://localhost:${PORT}`);
+                require('electron').shell.openExternal(`http://0.0.0.0:${PORT}`);
             }
         },
         {
@@ -50,7 +50,7 @@ function updateConnectionStatus() {
         {
             label: 'Open Dashboard',
             click: () => {
-                require('electron').shell.openExternal(`http://localhost:${PORT}`);
+                require('electron').shell.openExternal(`http://0.0.0.0:${PORT}`);
             }
         },
         {
@@ -76,7 +76,7 @@ function updateConnectionStatus() {
 app.whenReady().then(() => {
     // Start Express server
     serverInstance = server.start(PORT, () => {
-        console.log(`Server started on http://localhost:${PORT}`);
+        console.log(`Server started on http://0.0.0.0:${PORT}`);
     });
 
     // Create tray icon

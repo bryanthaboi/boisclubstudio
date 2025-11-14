@@ -23,14 +23,14 @@ app.use(express.json());
 
 // Serve static files with no-cache headers for development
 app.use(express.static(path.join(__dirname, 'public'), {
-  setHeaders: (res, path) => {
-    // Disable caching for HTML, CSS, and JS files
-    if (path.endsWith('.html') || path.endsWith('.css') || path.endsWith('.js')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
+    setHeaders: (res, path) => {
+        // Disable caching for HTML, CSS, and JS files
+        if (path.endsWith('.html') || path.endsWith('.css') || path.endsWith('.js')) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
     }
-  }
 }));
 
 // Connection management
@@ -177,8 +177,8 @@ function getConnectionStatus() {
 }
 
 function start(port, callback) {
-    const server = app.listen(port, 'localhost', () => {
-        console.log(`BCS Analytics Server running on http://localhost:${port}`);
+    const server = app.listen(port, '0.0.0.0', () => {
+        console.log(`BCS Analytics Server running on http://0.0.0.0:${port}`);
         if (callback) callback();
     });
 

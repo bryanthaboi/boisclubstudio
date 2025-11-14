@@ -7,7 +7,7 @@ if (-not (Test-Path $manifestPath)) {
 }
 
 $json = Get-Content $manifestPath -Raw | ConvertFrom-Json
-$versionParts = $json.version -split '\.'
+$versionParts = ($json.version -replace '^[vV]', '') -split '\.'
 if ($versionParts.Length -lt 3) {
     Write-Error "Version format must be MAJOR.MINOR.PATCH (found '$($json.version)')"
     exit 1
@@ -32,7 +32,7 @@ switch ($choice) {
     }
 }
 
-$json.version = ($versionInts -join '.')
+$json.version = "v{0}" -f (($versionInts -join '.'))
 $json | ConvertTo-Json -Depth 10 | Set-Content -NoNewline $manifestPath
 
 $newVersion = $json.version

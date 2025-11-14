@@ -2235,9 +2235,18 @@
 		bcsCustomTableContainer = document.createElement("div");
 		bcsCustomTableContainer.id = "bcs-custom-analytics-table";
 
-		// Build control buttons (fullscreen and close)
+		// Build control buttons (connection status, fullscreen, settings, close)
 		const controlsContainer = document.createElement("div");
 		controlsContainer.className = "bcs-panel-controls";
+
+		// Electron connection status button placeholder (always first)
+		const electronBtn = document.createElement("button");
+		electronBtn.className = "bcs-control-btn bcs-electron-btn";
+		electronBtn.setAttribute("aria-label", "Electron Backend");
+		electronBtn.title = "Electron Backend (Disabled)";
+		electronBtn.innerHTML = "○";
+		electronBtn.style.display = bcsSettings.electronBackend.enabled ? "" : "none";
+		controlsContainer.appendChild(electronBtn);
 
 		// Fullscreen button
 		const fullscreenBtn = document.createElement("button");
@@ -2257,7 +2266,18 @@
 			}
 		});
 
-		// Close button
+		// Inline settings button (next to close)
+		const inlineSettingsBtn = document.createElement("button");
+		inlineSettingsBtn.className = "bcs-control-btn bcs-inline-settings-btn";
+		inlineSettingsBtn.innerHTML = "⚙";
+		inlineSettingsBtn.title = "Settings";
+		inlineSettingsBtn.setAttribute("aria-label", "Settings");
+		inlineSettingsBtn.addEventListener("click", (e) => {
+			e.preventDefault();
+			toggleSettingsPanel();
+		});
+
+		// Close button (always last)
 		const closeBtn = document.createElement("button");
 		closeBtn.className = "bcs-control-btn";
 		closeBtn.innerHTML = "✕";
@@ -2273,6 +2293,7 @@
 		});
 
 		controlsContainer.appendChild(fullscreenBtn);
+		controlsContainer.appendChild(inlineSettingsBtn);
 		controlsContainer.appendChild(closeBtn);
 		bcsCustomTableContainer.appendChild(controlsContainer);
 
@@ -3467,24 +3488,19 @@
 			return;
 		}
 
-		// Find or create electron backend button
-		let electronBtn = bcsCustomTableContainer.querySelector(".bcs-electron-btn");
+		// Find or create electron backend button (should already exist as first control)
 		const controls = bcsCustomTableContainer.querySelector(".bcs-panel-controls");
 		if (!controls) {
 			return;
 		}
 
+		let electronBtn = controls.querySelector(".bcs-electron-btn");
 		if (!electronBtn) {
 			electronBtn = document.createElement("button");
 			electronBtn.className = "bcs-control-btn bcs-electron-btn";
 			electronBtn.setAttribute("aria-label", "Electron Backend");
-			// Insert before fullscreen button (which is the second button after settings)
-			const fullscreenBtn = controls.querySelector(".bcs-control-btn:nth-child(2)");
-			if (fullscreenBtn) {
-				controls.insertBefore(electronBtn, fullscreenBtn);
-			} else {
-				controls.appendChild(electronBtn);
-			}
+			electronBtn.innerHTML = "○";
+			controls.prepend(electronBtn);
 		}
 
 		const isConnected = bcsSettings.electronBackend.enabled && bcsElectronConnectionId !== null;
@@ -3507,12 +3523,7 @@
 		// Show/hide based on settings
 		electronBtn.style.display = bcsSettings.electronBackend.enabled ? "" : "none";
 
-		// Remove old event listeners and add new one
-		const newBtn = electronBtn.cloneNode(true);
-		electronBtn.parentNode.replaceChild(newBtn, electronBtn);
-		electronBtn = newBtn;
-
-		electronBtn.addEventListener("click", () => {
+		electronBtn.onclick = () => {
 			// Toggle enabled state
 			bcsSettings.electronBackend.enabled = !bcsSettings.electronBackend.enabled;
 			saveSettings();
@@ -3525,7 +3536,7 @@
 			}
 
 			updateElectronConnectionStatusUI();
-		});
+		};
 
 		bcsElectronConnectionStatusElement = electronBtn;
 	}

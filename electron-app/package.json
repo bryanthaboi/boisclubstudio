@@ -33,9 +33,11 @@
       "main.js",
       "server.js",
       "package.json",
-      "public/**/*"
+      "public/**/*",
+      "tray-icon.png"
     ],
     "win": {
+      "icon": "tray-icon.png",
       "target": [
         {
           "target": "nsis",
@@ -45,6 +47,7 @@
       "artifactName": "${productName}-win-${arch}.${ext}"
     },
     "mac": {
+      "icon": "tray-icon.png",
       "target": [
         {
           "target": "dmg",
@@ -59,6 +62,7 @@
       "category": "public.app-category.utilities"
     },
     "linux": {
+      "icon": "tray-icon.png",
       "target": [
         {
           "target": "AppImage",

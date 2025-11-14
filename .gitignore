@@ -15,6 +15,7 @@ boisclubstudio-extension.zip
 *.zip
 Thumbs.db
 desktop.ini
+versioner.ps1
 
 # IDE files
 .vscode/
