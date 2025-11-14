@@ -1,6 +1,5 @@
 node_modules/
 *.log
 .DS_Store
-tray-icon.png
-public/icon-*.png
+
 
