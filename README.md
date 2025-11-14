@@ -1,13 +1,21 @@
-# 🎬 Better YouTube Studio aka Boi's Club Studio
-![Bois Club Studio Logo](/logo.png)
+# Better YouTube Studio aka Boi's Club Studio
+
+<p align="center">
+<img src="/icons/icon-128.png">
+</p>
+
 > **Transform your YouTube Studio experience** with a beautiful, modern analytics dashboard that reveals metrics YouTube collects but never shows you.
 
-
-[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-brightgreen.svg)](#-installation)
-[![Electron App](https://img.shields.io/badge/Electron-App-blue.svg)](#-installation)
-[![License](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-brightgreen.svg?logo=googlechrome&logoColor=white&style=for-the-badge)](#-installation) [![Optional Companion App](https://img.shields.io/badge/Electron-App-blue.svg?logo=electron&logoColor=white&style=for-the-badge&label=Optional%20Companion)](#-installation) [![License](https://img.shields.io/badge/license-ISC-blue.svg?style=for-the-badge)](LICENSE) [![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/bryanthaboi/boisclubstudio?style=for-the-badge&logo=github&logoColor=white)](https://github.com/bryanthaboi/boisclubstudio/issues)
 
 > **Version 1.0** - Initial release with all core features!
+
+> **The extension is now available directly in the Chrome Web Store.**  
+> [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Install-4285F4?style=for-the-badge&logo=chromewebstore&logoColor=white)](https://chromewebstore.google.com/detail/better-youtube-studio-aka/fmcgjmnlobaomihlfbgoobabckndfjpn) ![Chrome Web Store Size](https://img.shields.io/chrome-web-store/size/fmcgjmnlobaomihlfbgoobabckndfjpn?style=for-the-badge&logo=chromewebstore)
+
+
+> **Support Discord**
+[![Discord](https://img.shields.io/discord/1019387038820216882?style=for-the-badge&logo=discord&logoColor=white)](https://bois.icu)
 
 ---
 
@@ -580,8 +588,6 @@ ISC License - See [LICENSE](/LICENSE.md) file for details.
 
 ## 🔗 Links
 
-- [Releases](https://github.com/bryanthaboi/boisclubstudio/releases)
-- [Issues](https://github.com/bryanthaboi/boisclubstudio/issues)
 - [YouTube Channel](https://youtube.com/@bryanthaboi2) - Where I posted the video for this extension
 - [Main YouTube Channel](https://youtube.com/@bryanthaboi) - Where I post Dragon Ball content
 

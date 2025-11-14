@@ -148,6 +148,11 @@
 			title: "Live analytics",
 			icon: "icons/analytics.svg",
 		},
+		{
+			key: "advancedAnalytics",
+			title: "Advanced analytics",
+			icon: "icons/adv.png",
+		}
 	];
 
 	function runtimeUrl(path) {
@@ -200,6 +205,8 @@
 		if (link) {
 			if (link.key === "analytics") {
 				window.location.href = makeLiveAnalyticsLink();
+			} else if (link.key === "advancedAnalytics") {
+				window.location.href = makeAdvancedAnalyticsLink();
 			} else {
 				window.location.href = link.href;
 			}
@@ -240,9 +247,20 @@
 		}
 		return null;
 	}
+	function makeAdvancedAnalyticsLink() {
+		if (bcsArtistID) {
+			return `https://studio.youtube.com/artist/${bcsArtistID}/analytics/tab-overview/period-default/total_reach-all/explore?entity_type=ARTIST&entity_id=${bcsArtistID}&time_period=4_weeks&total_reach_state=all&explore_type=TABLE_AND_CHART&metric=EXTERNAL_VIEWS&granularity=DAY&t_metrics=EXTERNAL_VIEWS&t_metrics=EXTERNAL_WATCH_TIME&t_metrics=VIDEO_THUMBNAIL_IMPRESSIONS&t_metrics=VIDEO_THUMBNAIL_IMPRESSIONS_VTR&dimension=VIDEO&o_column=EXTERNAL_VIEWS&o_direction=ANALYTICS_ORDER_DIRECTION_DESC`;
+		}
+		if (bcsChannelID) {
+			return `https://studio.youtube.com/channel/${bcsChannelID}/analytics/tab-overview/period-default/explore?entity_type=CHANNEL&entity_id=${bcsChannelID}&time_period=4_weeks&explore_type=TABLE_AND_CHART&metric=EXTERNAL_VIEWS&granularity=DAY&t_metrics=EXTERNAL_VIEWS&t_metrics=EXTERNAL_WATCH_TIME&t_metrics=VIDEO_THUMBNAIL_IMPRESSIONS&t_metrics=VIDEO_THUMBNAIL_IMPRESSIONS_VTR&dimension=VIDEO&o_column=EXTERNAL_VIEWS&o_direction=ANALYTICS_ORDER_DIRECTION_DESC`;
+		}
+		if (bcsExternalChannelID) {
+			return `https://studio.youtube.com/channel/${bcsExternalChannelID}/analytics/tab-overview/period-default/explore?entity_type=CHANNEL&entity_id=${bcsExternalChannelID}&time_period=4_weeks&explore_type=TABLE_AND_CHART&metric=EXTERNAL_VIEWS&granularity=DAY&t_metrics=EXTERNAL_VIEWS&t_metrics=EXTERNAL_WATCH_TIME&t_metrics=VIDEO_THUMBNAIL_IMPRESSIONS&t_metrics=VIDEO_THUMBNAIL_IMPRESSIONS_VTR&dimension=VIDEO&o_column=EXTERNAL_VIEWS&o_direction=ANALYTICS_ORDER_DIRECTION_DESC`;
+		}
+		return null;
+	}
 
 	function findHeaderContainer() {
-		// Prefer VidIQ's nav container location for consistent placement left of the search bar
 		const vidiqNav = document.querySelector("ytcp-omnisearch");
 		if (vidiqNav) return vidiqNav; // we'll inject as a direct child; CSS hides others but shows our panel
 
@@ -261,19 +279,7 @@
 			.toLowerCase();
 	}
 
-	function scheduleAnalyticsSync() {
-		if (!isAnalyticsPage()) return;
-		if (bcsAnalyticsSyncScheduled) return;
-		bcsAnalyticsSyncScheduled = true;
-		requestAnimationFrame(() => {
-			bcsAnalyticsSyncScheduled = false;
-			try {
-				applyJoinMetricsToAnalyticsTable();
-			} catch (error) {
-				console.log(error);
-			}
-		});
-	}
+
 
 	function updateJoinVideoCache(list) {
 		if (!Array.isArray(list) || !list.length) return;
@@ -2535,6 +2541,7 @@
 		// 48h metric cell
 		const metric48hCell = document.createElement("div");
 		metric48hCell.className = "bcs-metric-cell bcs-metric-cell-48h";
+		metric48hCell.dataset.metric = "48h";
 		const value48h = document.createElement("div");
 		value48h.className = "bcs-metric-value";
 		value48h.textContent = formatNumber(data.views48h || 0);
@@ -2553,6 +2560,7 @@
 		// 60m metric cell
 		const metric60mCell = document.createElement("div");
 		metric60mCell.className = "bcs-metric-cell bcs-metric-cell-60m";
+		metric60mCell.dataset.metric = "60m";
 		const value60m = document.createElement("div");
 		value60m.className = "bcs-metric-value";
 		value60m.textContent = formatNumber(data.views60m || 0);
@@ -2731,7 +2739,7 @@
 			return;
 		}
 
-		// Sort by 48h views (descending)
+		// Sort by 60m views (descending)
 		const sortedData = videoDataArray.sort((a, b) => b.views60m - a.views60m);
 		const newOrder = sortedData.map(d => d.videoId);
 
@@ -2783,10 +2791,10 @@
 			const hasMetricChange = likesChanged || commentsChanged || dislikesChanged;
 
 			// Update values
-			const value48h = row.querySelector(".bcs-metric-cell:first-of-type .bcs-metric-value");
-			const value60m = row.querySelector(".bcs-metric-cell:last-of-type .bcs-metric-value");
-			const sparkline48h = row.querySelector(".bcs-metric-cell:first-of-type .bcs-sparkline");
-			const sparkline60m = row.querySelector(".bcs-metric-cell:last-of-type .bcs-sparkline");
+			const value48h = row.querySelector('.bcs-metric-cell[data-metric="48h"] .bcs-metric-value');
+			const value60m = row.querySelector('.bcs-metric-cell[data-metric="60m"] .bcs-metric-value');
+			const sparkline48h = row.querySelector('.bcs-metric-cell[data-metric="48h"] .bcs-sparkline');
+			const sparkline60m = row.querySelector('.bcs-metric-cell[data-metric="60m"] .bcs-sparkline');
 			const metrics = row.querySelector(".bcs-video-metrics");
 
 			// Always update 48h and 60m values and sparklines (they can change independently)
@@ -3093,10 +3101,10 @@
 		const thumbnail = row.querySelector(".bcs-thumbnail");
 		const publishDate = row.querySelector(".bcs-publish-date");
 		const metrics = row.querySelector(".bcs-video-metrics");
-		const value48h = row.querySelector(".bcs-metric-cell:first-of-type .bcs-metric-value");
-		const value60m = row.querySelector(".bcs-metric-cell:last-of-type .bcs-metric-value");
-		const sparkline48h = row.querySelector(".bcs-metric-cell:first-of-type .bcs-sparkline");
-		const sparkline60m = row.querySelector(".bcs-metric-cell:last-of-type .bcs-sparkline");
+		const value48h = row.querySelector('.bcs-metric-cell[data-metric="48h"] .bcs-metric-value');
+		const value60m = row.querySelector('.bcs-metric-cell[data-metric="60m"] .bcs-metric-value');
+		const sparkline48h = row.querySelector('.bcs-metric-cell[data-metric="48h"] .bcs-sparkline');
+		const sparkline60m = row.querySelector('.bcs-metric-cell[data-metric="60m"] .bcs-sparkline');
 
 		// Get previous metrics
 		const previous = bcsPreviousMetrics.get(data.videoId) || {};

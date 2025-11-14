@@ -1012,6 +1012,8 @@
 				width: 120px;
 				height: 32px;
 				flex-shrink: 0;
+				position: relative;
+				overflow: visible;
 			}
 			#bcs-custom-analytics-table .bcs-sparkline svg {
 				width: 100%;
@@ -1053,25 +1055,33 @@
 				fill: url(#bcs-sparkline-gradient);
 				opacity: 0.3;
 			}
-			/* Sparkline glow effect when view count increases */
-			#bcs-custom-analytics-table .bcs-sparkline.bcs-sparkline-glow {
-				animation: bcsSparklineGlow 2s ease-in-out infinite;
+			/* Sparkline hot streak - outer orbit glow (60m only) */
+			#bcs-custom-analytics-table .bcs-metric-cell-60m .bcs-sparkline.bcs-sparkline-glow::after {
+				content: "";
+				position: absolute;
+				inset: -6px;
+				border-radius: 10px;
+				border: 2px solid rgba(169, 87, 255, 0.6);
+				box-shadow: 0 0 18px rgba(169, 87, 255, 0.5);
+				opacity: 0;
+				pointer-events: none;
+				animation: bcsSparklineOrbit 1.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
 			}
-			#bcs-custom-analytics-table .bcs-sparkline.bcs-sparkline-glow .bcs-sparkline-path {
-				filter: drop-shadow(0 0 8px rgba(169, 87, 255, 0.8)) drop-shadow(0 0 4px rgba(169, 87, 255, 0.5));
-			}
-			#bcs-custom-analytics-table .bcs-metric-cell-48h .bcs-sparkline.bcs-sparkline-glow .bcs-sparkline-path {
-				filter: drop-shadow(0 0 8px rgba(95, 255, 87, 0.8)) drop-shadow(0 0 4px rgba(95, 255, 87, 0.5));
-			}
-			#bcs-custom-analytics-table .bcs-metric-cell-60m .bcs-sparkline.bcs-sparkline-glow .bcs-sparkline-path {
-				filter: drop-shadow(0 0 8px rgba(169, 87, 255, 0.8)) drop-shadow(0 0 4px rgba(169, 87, 255, 0.5));
-			}
-			@keyframes bcsSparklineGlow {
-				0%, 100% {
-					opacity: 1;
+			@keyframes bcsSparklineOrbit {
+				0% {
+					transform: scale(0.92);
+					opacity: 0;
 				}
-				50% {
+				25% {
 					opacity: 0.8;
+				}
+				60% {
+					transform: scale(1.08);
+					opacity: 0.4;
+				}
+				100% {
+					transform: scale(0.92);
+					opacity: 0;
 				}
 			}
 			#bcs-custom-analytics-table .bcs-empty-state {
@@ -2238,3 +2248,12 @@ ytcp-table-header#table-header {
 #bcs-settings-panel {
     font-family: 'Roboto', sans-serif;
 }
+
+
+#bcs-quick-panel > :last-child{
+	width:79px;
+  }
+  #bcs-quick-panel > :last-child img{
+	width:unset !important;
+  }
+  

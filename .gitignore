@@ -9,6 +9,10 @@ build/
 
 # OS files
 .DS_Store
+
+# Extension build output
+boisclubstudio-extension.zip
+*.zip
 Thumbs.db
 desktop.ini
 
