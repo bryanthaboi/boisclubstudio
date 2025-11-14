@@ -31,6 +31,7 @@
 	let bcsSubscriberHistory = []; // Array of {dateId, count} for sparkline chart
 	let bcsPreviousSubscriberCount = null; // For change detection
 	const bcsVideoEarnings = new Map(); // videoId -> earnings in dollars
+	const bcsVideoShares = new Map(); // videoId -> share counts
 	const bcsVideoSubscriberNetChange = new Map(); // videoId -> subscriber net change
 	const bcsVideoWatchTime = new Map(); // videoId -> external watch time (milliseconds)
 	const bcsVideoCTR = new Map(); // videoId -> CTR (VIDEO_THUMBNAIL_IMPRESSIONS_VTR)
@@ -752,6 +753,7 @@
 			let subscriberNetChangeColumn = null;
 			let watchTimeColumn = null;
 			let ctrColumn = null;
+			let sharesColumn = null;
 
 			dimensionColumns.forEach((col, idx) => {
 				if (col.dimension?.type === "VIDEO") {
@@ -779,6 +781,8 @@
 					}
 				} else if (metricType === "VIDEO_THUMBNAIL_IMPRESSIONS_VTR" && col.percentages?.values) {
 					ctrColumn = col.percentages.values;
+				} else if (metricType === "SHARINGS" && col.counts?.values) {
+					sharesColumn = col.counts.values;
 				}
 			});
 
@@ -815,6 +819,11 @@
 				// CTR (VIDEO_THUMBNAIL_IMPRESSIONS_VTR) - percentage
 				if (ctrColumn && ctrColumn[i] !== undefined) {
 					bcsVideoCTR.set(videoId, Number(ctrColumn[i]) || 0);
+				}
+
+				// Shares
+				if (sharesColumn && sharesColumn[i] !== undefined) {
+					bcsVideoShares.set(videoId, Number(sharesColumn[i]) || 0);
 				}
 			}
 		} catch (e) {
@@ -1850,6 +1859,7 @@
 			const subscriberNetChange = bcsVideoSubscriberNetChange.get(videoId) || null;
 			const watchTime = bcsVideoWatchTime.get(videoId) || null;
 			const ctr = bcsVideoCTR.get(videoId) || null;
+			const shares = bcsVideoShares.get(videoId) ?? null;
 
 			videoDataArray.push({
 				videoId,
@@ -1868,6 +1878,7 @@
 				subscriberNetChange: subscriberNetChange,
 				watchTime: watchTime,
 				ctr: ctr,
+				shares: shares,
 			});
 		});
 
@@ -2477,6 +2488,15 @@
 			metrics.appendChild(subChangeBadge);
 		}
 
+		// Add shares badge if exists
+		if (data.shares !== null && data.shares !== undefined) {
+			const sharesBadge = document.createElement("span");
+			sharesBadge.className = "bcs-metric-badge bcs-badge-shares";
+			sharesBadge.textContent = `🔁 ${formatNumber(data.shares)}`;
+			sharesBadge.title = "Shares";
+			metrics.appendChild(sharesBadge);
+		}
+
 		// Add watch time badge if exists
 		if (data.watchTime !== null && data.watchTime !== undefined) {
 			const watchTimeBadge = document.createElement("span");
@@ -2939,6 +2959,15 @@
 							metrics.appendChild(subChangeBadge);
 						}
 
+						// Add shares badge if exists
+						if (videoData.shares !== null && videoData.shares !== undefined) {
+							const sharesBadge = document.createElement("span");
+							sharesBadge.className = "bcs-metric-badge bcs-badge-shares";
+							sharesBadge.textContent = `🔁 ${formatNumber(videoData.shares)}`;
+							sharesBadge.title = "Shares";
+							metrics.appendChild(sharesBadge);
+						}
+
 						// Add watch time badge if exists
 						if (videoData.watchTime !== null && videoData.watchTime !== undefined) {
 							const watchTimeBadge = document.createElement("span");
@@ -2985,6 +3014,7 @@
 						const likeBadge = metrics.querySelector(".bcs-badge-likes");
 						const commentBadge = metrics.querySelector(".bcs-badge-comments");
 						const dislikeBadge = metrics.querySelector(".bcs-badge-dislikes");
+						const sharesBadge = metrics.querySelector(".bcs-badge-shares");
 
 						if (likeBadge) {
 							const newText = `✅ ${formatNumber(videoData.likeCount || 0)}`;
@@ -3029,6 +3059,25 @@
 							}
 							// Update visibility based on settings
 							dislikeBadge.style.display = bcsSettings.badges.dislikes ? "" : "none";
+						}
+
+						if (sharesBadge) {
+							const newText = `🔁 ${formatNumber(videoData.shares ?? 0)}`;
+							if (sharesBadge.textContent !== newText) {
+								sharesBadge.textContent = newText;
+							}
+							sharesBadge.title = "Shares";
+							if (videoData.shares === null || videoData.shares === undefined) {
+								sharesBadge.style.display = "none";
+							} else {
+								sharesBadge.style.display = "";
+							}
+						} else if (videoData.shares !== null && videoData.shares !== undefined) {
+							const newSharesBadge = document.createElement("span");
+							newSharesBadge.className = "bcs-metric-badge bcs-badge-shares";
+							newSharesBadge.textContent = `🔁 ${formatNumber(videoData.shares)}`;
+							newSharesBadge.title = "Shares";
+							metrics.appendChild(newSharesBadge);
 						}
 					}
 				}
@@ -3241,6 +3290,15 @@
 				subChangeBadge.textContent = `👥 ${sign}${formatNumber(data.subscriberNetChange)}`;
 				subChangeBadge.title = "Subscriber Net Change";
 				metrics.appendChild(subChangeBadge);
+			}
+
+			// Add shares badge if exists
+			if (data.shares !== null && data.shares !== undefined) {
+				const sharesBadge = document.createElement("span");
+				sharesBadge.className = "bcs-metric-badge bcs-badge-shares";
+				sharesBadge.textContent = `🔁 ${formatNumber(data.shares)}`;
+				sharesBadge.title = "Shares";
+				metrics.appendChild(sharesBadge);
 			}
 
 			// Add watch time badge if exists

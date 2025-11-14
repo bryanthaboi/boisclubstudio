@@ -32,11 +32,13 @@ switch ($choice) {
     }
 }
 
-$json.version = "v{0}" -f (($versionInts -join '.'))
+$manifestVersion = ($versionInts -join '.')
+$tagVersion = "v{0}" -f $manifestVersion
+
+$json.version = $manifestVersion
 $json | ConvertTo-Json -Depth 10 | Set-Content -NoNewline $manifestPath
 
-$newVersion = $json.version
-Write-Host "Updated manifest version to $newVersion"
+Write-Host "Updated manifest version to $manifestVersion"
 
 git add *
 if ($LASTEXITCODE -ne 0) {
@@ -44,13 +46,13 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-git commit -m "release $newVersion"
+git commit -m "release $tagVersion"
 if ($LASTEXITCODE -ne 0) {
     Write-Error "git commit failed."
     exit $LASTEXITCODE
 }
 
-git tag $newVersion
+git tag $tagVersion
 if ($LASTEXITCODE -ne 0) {
     Write-Error "git tag failed."
     exit $LASTEXITCODE
@@ -68,4 +70,4 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host "Version bump complete. Tag '$newVersion' pushed."
+Write-Host "Version bump complete. Tag '$tagVersion' pushed."
